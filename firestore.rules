@@ -1,0 +1,60 @@
+rules_version = '2';
+
+// Reglas del examen de Álgebra (Portafolio 2).
+// - Alumno (sin sesión): solo puede CREAR su registro y sus intentos de refuerzo, con datos validados.
+// - Nadie puede MODIFICAR un registro existente.
+// - Solo el administrador (correo + contraseña) puede LEER, LISTAR y BORRAR.
+// Antes de publicar: reemplaza __ADMIN_EMAIL__ por el correo del administrador
+// y en Authentication → Settings desactiva "Enable create (sign-up)" para que nadie más cree cuentas.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == '__ADMIN_EMAIL__'
+        && request.auth.token.firebase.sign_in_provider == 'password';
+    }
+
+    function validAttempt() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['version', 'nombre', 'grupo', 'inicio', 'fin', 'duracionMs', 'notas', 'teoria',
+                               'practica', 'dominados', 'repasar', 'dispositivo', 'creado'])
+        && d.keys().hasAll(['nombre', 'inicio', 'fin', 'notas', 'teoria', 'practica', 'creado'])
+        && d.nombre is string && d.nombre.size() >= 3 && d.nombre.size() <= 120
+        && d.grupo is string && d.grupo.size() <= 60
+        && d.inicio is number && d.fin is number && d.fin >= d.inicio
+        && d.notas.keys().hasOnly(['teorica', 'practica', 'global'])
+        && d.notas.global is number && d.notas.global >= 0 && d.notas.global <= 10
+        && d.teoria is list && d.teoria.size() <= 20
+        && d.practica is list && d.practica.size() <= 20
+        && d.creado == request.time;
+    }
+
+    function validRefuerzo() {
+      let d = request.resource.data;
+      return d.keys().hasOnly(['tema', 'ejercicio', 'respuesta', 'estado', 'error', 'ms', 'creado'])
+        && d.tema is string && d.tema.size() <= 10
+        && d.ejercicio is string && d.ejercicio.size() <= 10
+        && d.respuesta is string && d.respuesta.size() <= 300
+        && d.estado in ['correct', 'incorrect']
+        && d.creado == request.time;
+    }
+
+    match /intentos/{id} {
+      allow create: if validAttempt();
+      allow get, list, delete: if isAdmin();
+      allow update: if false;
+
+      match /refuerzos/{rid} {
+        allow create: if exists(/databases/$(database)/documents/intentos/$(id)) && validRefuerzo();
+        allow get, list, delete: if isAdmin();
+        allow update: if false;
+      }
+    }
+
+    // Todo lo demás está cerrado.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

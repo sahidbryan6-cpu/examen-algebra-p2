@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+/*
+ * Tokens del sistema de diseño (DISEÑO.md). Los componentes usan solo estas variables.
+ * Claro y oscuro automáticos por prefers-color-scheme.
+ */
+:root {
+  --bg: #f6f7f9;
+  --grid: rgb(30 58 95 / 0.06);
+  --card: #ffffff;
+  --fg: #0f172a;
+  --muted: #e9eef5;
+  --muted-fg: #475569;
+  --border: #cbd5e1;
+  --primary: #1e3a5f;
+  --on-primary: #ffffff;
+  --accent: #a16207;
+  --ring: #2563eb;
+  --ok: #15803d;
+  --ok-bg: #dcfce7;
+  --warn: #c2410c;
+  --warn-bg: #ffedd5;
+  --bad: #b91c1c;
+  --bad-bg: #fee2e2;
+  --shadow: 0 1px 2px rgb(15 23 42 / 0.06), 0 8px 24px -12px rgb(15 23 42 / 0.18);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1220;
+    --grid: rgb(147 183 234 / 0.05);
+    --card: #111a2e;
+    --fg: #e5ecf5;
+    --muted: #1a2540;
+    --muted-fg: #a3b3c9;
+    --border: #2a3a5a;
+    --primary: #93b7ea;
+    --on-primary: #0b1220;
+    --accent: #e0a73a;
+    --ring: #93b7ea;
+    --ok: #4ade80;
+    --ok-bg: rgb(74 222 128 / 0.12);
+    --warn: #fb923c;
+    --warn-bg: rgb(251 146 60 / 0.12);
+    --bad: #f87171;
+    --bad-bg: rgb(248 113 113 / 0.12);
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-card: var(--card);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-muted-fg: var(--muted-fg);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-accent: var(--accent);
+  --color-ring: var(--ring);
+  --color-ok: var(--ok);
+  --color-ok-bg: var(--ok-bg);
+  --color-warn: var(--warn);
+  --color-warn-bg: var(--warn-bg);
+  --color-bad: var(--bad);
+  --color-bad-bg: var(--bad-bg);
+  --font-serif: "Crimson Pro", Georgia, serif;
+  --font-sans: "Atkinson Hyperlegible", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --shadow-card: var(--shadow);
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background-color: var(--bg);
+  /* Papel cuadriculado: el sello visual del sitio */
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+:focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; border-radius: 6px; }
+button { cursor: pointer; }
+/* Los hijos de una retícula pueden encogerse: evita que pestañas o fórmulas largas generen scroll horizontal */
+.grid > * { min-width: 0; }
+button:disabled { cursor: not-allowed; }
+.katex { font-size: 1.08em; }
+.katex-display { overflow-x: auto; overflow-y: hidden; padding: 4px 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
